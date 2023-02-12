@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'SongsMashup'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_E1E44BF5E1034EF5894F0C5FE602BC6B }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5919AF569CDA44018EFA9C93C4F8EBB8 }}
