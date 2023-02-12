@@ -6,6 +6,7 @@ import sys
 from pytube import YouTube, Search
 from .forms import MashupForm
 import shutil
+import zipfile
 
 def send_email(to_email, file_path):
     subject = 'Mashup Result'
@@ -13,14 +14,19 @@ def send_email(to_email, file_path):
     email = EmailMessage(
         subject, message, to=[to_email]
     )
-    email.attach_file(file_path)
+    with zipfile.ZipFile('mashup.zip', 'w') as myzip:
+        myzip.write(file_path)
+    email.attach_file('mashup.zip')
     email.send()
+    os.remove('mashup.zip')
+
 
 def download_videos(singer, num_videos):
     videos = []
     search_query = singer
-    search_result = Search(search_query)
-    for video in search_result.results:
+    search_result = Search(search_query).results
+    search_result.sort(key=lambda x: x.views, reverse=True)
+    for video in search_result:
         video_url = f"{video.watch_url}"
         yt = YouTube(video_url)
         if yt.length <= 600 and yt.streams.filter(res="144p").first() is not None:
@@ -28,8 +34,7 @@ def download_videos(singer, num_videos):
         if len(videos) == num_videos:
             break
     if len(videos) < num_videos:
-        print("def")
-        raise Exception("Unable to find {} videos of {} with resolution 144p and duration less than 5 minutes.".format(num_videos, singer))
+        raise Exception("Unable to find {} videos of {} with resolution 144p and duration less than 10 minutes.".format(num_videos, singer))
     return videos
 
 def convert_to_audio(video, singer):
@@ -49,7 +54,6 @@ def merge_audios(audios, output_file):
 def main(request):
     if request.method == 'POST':
         form = MashupForm(request.POST)
-        print("abc")
         if form.is_valid():
             singer = form.cleaned_data['singer_name']
             num_videos = form.cleaned_data['number_of_videos']
@@ -72,7 +76,7 @@ def main(request):
                 output_file = os.path.join(singer_folder, "mashup.mp3")
                 merge_audios(audios, output_file)
                 send_email(email, output_file)
-                shutil.rmtree(singer_folder)
+                shutil.rmtree(singer_folder,ignore_errors=True)
                 return render(request, 'success.html')
             except Exception as e:
                 print(str(e))
