@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mashup Creator</title>
+</head>
+<body>
+    <h1>Create your own mashup!</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Mashup</button>
+    </form>
+</body>
+</html>
