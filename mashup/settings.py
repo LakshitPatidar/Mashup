@@ -33,9 +33,10 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CSRF_TRUSTED_ORIGINS = [
     'https://www.<domain.com>',
-    'http://www.<domain.com>'
+    'http://www.<domain.com>',
+    'https://www.<domain.net>',
+    'http://www.<domain.net>',
 ]
-
 # Application definition
 
 INSTALLED_APPS = [
